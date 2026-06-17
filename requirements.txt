@@ -2,5 +2,5 @@ kerykeion>=4.11
 anthropic>=0.40
 streamlit>=1.40
 geopy>=2.4
-timezonefinder==6.2.0
+timezonefinder>=6.5.0
 python-dotenv>=1.0
