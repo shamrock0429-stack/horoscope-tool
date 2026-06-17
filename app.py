@@ -36,31 +36,31 @@ with st.sidebar:
     )
 
 # ── 入力フォーム ───────────────────────────────────────────────
-with st.form("input_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        birth_date = st.date_input(
-            "生年月日",
-            value=datetime.date(1990, 1, 1),
-            min_value=datetime.date(1900, 1, 1),
-            max_value=datetime.date.today(),
-        )
-    with col2:
-        use_time = st.checkbox("出生時刻を入力する", value=False)
-        birth_time_input = st.time_input(
-            "出生時刻（任意）",
-            value=datetime.time(12, 0),
-            step=60,
-            disabled=not use_time,
-            help="入力するとASC・ハウスも計算されより精度が上がります。",
-        )
-
-    birth_place = st.text_input(
-        "出生地",
-        placeholder="例: Tokyo / Osaka / New York / Paris",
-        help="英語表記の方が検索精度が上がります。",
+col1, col2 = st.columns(2)
+with col1:
+    birth_date = st.date_input(
+        "生年月日",
+        value=datetime.date(1990, 1, 1),
+        min_value=datetime.date(1900, 1, 1),
+        max_value=datetime.date.today(),
+    )
+with col2:
+    use_time = st.checkbox("出生時刻を入力する", value=False)
+    birth_time_input = st.time_input(
+        "出生時刻（任意）",
+        value=datetime.time(12, 0),
+        step=60,
+        disabled=not use_time,
+        help="入力するとASC・ハウスも計算されより精度が上がります。",
     )
 
+birth_place = st.text_input(
+    "出生地",
+    placeholder="例: Tokyo / Osaka / New York / Paris",
+    help="英語表記の方が検索精度が上がります。",
+)
+
+with st.form("input_form"):
     submitted = st.form_submit_button("診断する", type="primary", use_container_width=True)
 
 # ── 診断実行 ───────────────────────────────────────────────────
