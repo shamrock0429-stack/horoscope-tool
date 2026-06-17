@@ -143,6 +143,61 @@ horoscope_tool/
 
 ---
 
+## 2026-06-17 | Streamlit Cloud デプロイ・バグ修正
+
+### 作業1: GitHub リポジトリ作成・公開設定
+
+- `gh repo create` で `shamrock0429-stack/horoscope-tool` を作成（初期は Private）
+- Streamlit Community Cloud の無料枠はパブリックリポジトリが必要なため Public に変更
+- `.env`（APIキー）は `.gitignore` により除外済み、コミット対象外
+
+### 作業2: Streamlit Cloud デプロイ時のビルドエラー解消
+
+**エラー1: cffi ビルド失敗**
+- 原因: `ffi.h` が見つからない（`libffi-dev` 未インストール）
+- 対処: `packages.txt` を新規作成し `build-essential` / `libffi-dev` を追記
+
+**エラー2: h3==3.7.7 CMake ビルド失敗**
+- 原因: `timezonefinder==6.2.0` が `h3==3.7.7` を要求 → CMake < 3.5 の非互換
+- 対処: `requirements.txt` を `timezonefinder>=6.5.0` に変更（6.5.0 以降 h3 が任意依存）
+
+**エラー3: runtime.txt フォーマット誤り**
+- 誤: `python-3.11` / 正: `3.11`（バージョン番号のみ）
+- Streamlit Cloud は `python-X.Y` 形式を認識しない
+
+**エラー4: swisseph Python 3.14 ABI 非互換**
+- 原因: Streamlit Cloud が Python 3.14 を使用。swisseph の .so が `_ZSt7nothrow` を参照するが libstdc++ 側で未エクスポート
+- 対処: `runtime.txt` を `3.12` に変更 → ただし **Reboot では反映されず、Delete & 再デプロイが必要**
+
+### 作業3: アプリのバグ修正
+
+**バグ1: 出生時刻チェックボックスが機能しない**
+- 原因: `st.checkbox` と `st.time_input` を `st.form` 内に置いていたため、チェックしても即時再レンダリングされず `disabled` 状態が切り替わらなかった
+- 対処: チェックボックス・時刻入力・出生地入力を `st.form` の外に移動。フォームには送信ボタンのみ残す
+
+**バグ2: サイドバーがデフォルトで開いた状態**
+- 対処: `st.set_page_config` に `initial_sidebar_state="collapsed"` を追加
+
+### 現在のデプロイ状況
+
+| 項目 | 状態 |
+|------|------|
+| GitHub リポジトリ | https://github.com/shamrock0429-stack/horoscope-tool |
+| Streamlit URL | https://horoscope-tool-xdkwf6rg2k8hfjavm53a3s.streamlit.app/ |
+| Python バージョン | `runtime.txt=3.12` 設定済み（要 Delete & 再デプロイで反映） |
+| ビルドエラー | h3/cffi/swisseph 問題すべて対処済み |
+| APIキー設定 | Streamlit Secrets（ANTHROPIC_API_KEY）への登録が必要 |
+
+### Streamlit Secrets 設定手順
+
+アプリの ⋮ → Settings → Secrets に以下を貼り付けて保存:
+
+```toml
+ANTHROPIC_API_KEY = "sk-ant-api03-..."
+```
+
+---
+
 ## 今後の拡張候補
 
 - **新モジュール追加案**（modules.py に辞書を追記するだけ）
